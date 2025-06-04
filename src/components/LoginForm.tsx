@@ -3,36 +3,88 @@ import { useRouter } from 'next/router';
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const validateUsername = (username: string): boolean => {
+    if (username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      return false;
+    }
+    if (username.length > 50) {
+      setError('Username cannot exceed 50 characters');
+      return false;
+    }
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      setError('Username can only contain letters, numbers, underscores, and hyphens');
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim()) return;
+    setError('');
+    const trimmedUsername = username.trim();
+    
+    if (!validateUsername(trimmedUsername)) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: trimmedUsername,
+          timestamp: new Date().toISOString() // ISO 8601 format
+        })
+      });
 
-    const response = await fetch('/api/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.trim() })
-    });
+      const data = await response.json();
 
-    if (response.ok) {
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      // Store session info
+      localStorage.setItem('sessionStartTime', new Date().toISOString());
+      localStorage.setItem('username', trimmedUsername);
+
       router.push('/hello');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Enter username"
-        className="border p-2 rounded"
-        required
-      />
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-        Login
-      </button>
-    </form>
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => {
+              setUsername(e.target.value);
+              setError('');
+            }}
+            placeholder="Enter username"
+            className={`border p-2 rounded w-full ${error ? 'border-red-500' : ''}`}
+            required
+            disabled={loading}
+          />
+          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+        </div>
+        <button 
+          type="submit" 
+          className={`w-full bg-blue-500 text-white p-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
+          disabled={loading}
+        >
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+    </div>
   );
 }

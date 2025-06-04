@@ -1,5 +1,10 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Project Updates
+
+- All timestamps in the UI and documentation follow ISO 8601 format with milliseconds (e.g., 2025-04-13T12:34:56.789Z)
+- Updated ESLint configuration used
+
 ## Getting Started
 
 First, run the development server:

@@ -23,11 +23,11 @@ export async function getUsers(): Promise<User[]> {
   return JSON.parse(data);
 }
 
-export async function addUser(username: string): Promise<User> {
+export async function addUser(username: string, timestamp: string): Promise<User> {
   const users = await getUsers();
   const newUser = {
     username,
-    registrationTime: new Date().toISOString()
+    registrationTime: timestamp
   };
   
   await fs.writeFile(USER_FILE_PATH, JSON.stringify([...users, newUser], null, 2));
