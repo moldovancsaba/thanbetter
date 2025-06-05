@@ -17,8 +17,7 @@ const sessionSchema = new mongoose.Schema<ISession>({
   },
   token: {
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
   createdAt: {
     type: Date,
