@@ -41,6 +41,16 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // Add CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -53,39 +63,67 @@ export default async function handler(
     }
 
     const { username, timestamp } = req.body as LoginRequest;
+    console.log('Login attempt:', { username, timestamp }); // Add logging
 
     // Validate request data
     if (!username || typeof username !== 'string') {
+      console.log('Invalid username:', username);
       return res.status(400).json({ error: 'Invalid username' });
     }
 
     // Add username pattern validation
     if (!username.match(USERNAME_PATTERN)) {
+      console.log('Username pattern mismatch:', username);
       return res.status(400).json({ 
         error: 'Username must be 3-20 characters long and contain only letters, numbers, underscores, and hyphens' 
       });
     }
 
-    if (!timestamp || !timestamp.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)) {
-      return res.status(400).json({ error: 'Invalid timestamp format. Use ISO 8601 format (e.g., 2025-04-13T12:34:56.789Z)' });
+    // Less strict timestamp validation
+    if (!timestamp) {
+      console.log('Missing timestamp');
+      return res.status(400).json({ error: 'Timestamp is required' });
+    }
+
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+    } catch (e) {
+      console.log('Invalid timestamp format:', timestamp);
+      return res.status(400).json({ 
+        error: 'Invalid timestamp format. Use ISO 8601 format (e.g., 2025-04-13T12:34:56.789Z)' 
+      });
     }
 
     const users = await getUsers();
     const existingUser = users.find(user => user.username.toLowerCase() === username.toLowerCase());
 
-    // Create or update user with timestamp
-    if (!existingUser) {
-      await addUser(username, timestamp);
+    try {
+      // Create or update user with timestamp
+      if (!existingUser) {
+        await addUser(username, timestamp);
+      }
+
+      // Generate session token with error handling
+      let sessionToken;
+      try {
+        sessionToken = Buffer.from(`${username}-${Date.now()}`).toString('base64');
+      } catch (e) {
+        console.error('Session token generation error:', e);
+        return res.status(500).json({ error: 'Failed to generate session token' });
+      }
+
+      res.status(200).json({
+        success: true,
+        sessionToken,
+        loginTime: timestamp
+      });
+    } catch (e) {
+      console.error('User management error:', e);
+      return res.status(500).json({ error: 'Failed to manage user data' });
     }
-
-    // Generate session token (in a real app, use a proper session management system)
-    const sessionToken = Buffer.from(`${username}-${Date.now()}`).toString('base64');
-
-    res.status(200).json({
-      success: true,
-      sessionToken,
-      loginTime: timestamp
-    });
   } catch (error) {
     console.error('Auth error:', error);
     res.status(500).json({ error: 'Internal server error' });
