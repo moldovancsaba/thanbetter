@@ -6,6 +6,15 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - All timestamps in the UI and documentation follow ISO 8601 format with milliseconds (e.g., 2025-04-13T12:34:56.789Z)
 - Updated ESLint configuration used
 
+## Upcoming Features (Target: 2025-07-04T00:00:00.000Z)
+
+- Session management for improved user authentication
+- Comprehensive session and activity logging
+- MongoDB Atlas integration for centralized data storage
+- Enhanced security features
+
+View the complete roadmap in [docs/roadmap.md](docs/roadmap.md)
+
 ## Getting Started
 
 First, run the development server:
