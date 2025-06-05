@@ -7,28 +7,12 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const validateUsername = (username: string): boolean => {
-    if (username.length < 3) {
-      setError('Username must be at least 3 characters long');
-      return false;
-    }
-    if (username.length > 50) {
-      setError('Username cannot exceed 50 characters');
-      return false;
-    }
-    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-      setError('Username can only contain letters, numbers, underscores, and hyphens');
-      return false;
-    }
-    return true;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     const trimmedUsername = username.trim();
     
-    if (!validateUsername(trimmedUsername)) return;
+    if (!trimmedUsername) return;
     
     setLoading(true);
     try {
