@@ -15,9 +15,7 @@ async function cleanupExpiredSessions() {
     console.log(`Found ${expiredSessions.length} expired sessions to clean up`);
 
     for (const session of expiredSessions) {
-      await SessionService.deactivateSession(session._id.toString(), 'EXPIRED', {
-        reason: 'Automatic cleanup of expired session'
-      });
+      await SessionService.deactivateSession(session._id.toString(), 'EXPIRED');
     }
 
     console.log('Session cleanup completed successfully');

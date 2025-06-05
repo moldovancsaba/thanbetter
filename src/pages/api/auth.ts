@@ -66,7 +66,8 @@ export default async function handler(
       return res.status(429).json({ error: 'Too many login attempts. Please try again later.' });
     }
 
-    const { username, timestamp } = req.body as LoginRequest;
+    const { username } = req.body as LoginRequest;
+    const timestamp = new Date().toISOString(); // Generate timestamp on server side
     console.log('Login attempt:', { username, timestamp });
 
     // Validate request data
@@ -80,24 +81,6 @@ export default async function handler(
       console.log('Username pattern mismatch:', username);
       return res.status(400).json({ 
         error: 'Username must be 3-20 characters long and contain only letters, numbers, underscores, and hyphens' 
-      });
-    }
-
-    // Validate timestamp
-    if (!timestamp) {
-      console.log('Missing timestamp');
-      return res.status(400).json({ error: 'Timestamp is required' });
-    }
-
-    try {
-      const date = new Date(timestamp);
-      if (isNaN(date.getTime())) {
-        throw new Error('Invalid date');
-      }
-    } catch (e) {
-      console.log('Invalid timestamp format:', timestamp);
-      return res.status(400).json({ 
-        error: 'Invalid timestamp format. Use ISO 8601 format (e.g., 2025-04-13T12:34:56.789Z)' 
       });
     }
 

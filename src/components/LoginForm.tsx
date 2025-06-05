@@ -36,8 +36,7 @@ export default function LoginForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: trimmedUsername,
-          timestamp: new Date().toISOString() // ISO 8601 format
+          username: trimmedUsername
         })
       });
 
@@ -48,8 +47,10 @@ export default function LoginForm() {
       }
 
       // Store session info
-      localStorage.setItem('sessionStartTime', new Date().toISOString());
-      localStorage.setItem('username', trimmedUsername);
+      localStorage.setItem('sessionToken', data.sessionToken);
+      localStorage.setItem('userId', data.userId);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('loginTime', data.loginTime);
 
       router.push('/hello');
     } catch (err) {

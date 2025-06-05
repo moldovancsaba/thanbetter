@@ -30,7 +30,7 @@ export function withAuth(handler: NextApiHandler) {
       // Add session info to the request
       req.session = {
         userId: session.userId.toString(),
-        sessionId: session._id.toString()
+        sessionId: (session as any)._id.toString()
       };
 
       // Continue to the handler
