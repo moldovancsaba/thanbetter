@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getUsers, addUser } from '../../utils/users';
+import connectToDatabase from '../../lib/mongodb';
+import User from '../../models/User';
+import { SessionService } from '../../services/sessionService';
 
 // Constants for validation and rate limiting
 const USERNAME_PATTERN = /^[a-zA-Z0-9_-]{3,20}$/;
@@ -41,6 +43,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  await connectToDatabase();
+
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -63,7 +67,7 @@ export default async function handler(
     }
 
     const { username, timestamp } = req.body as LoginRequest;
-    console.log('Login attempt:', { username, timestamp }); // Add logging
+    console.log('Login attempt:', { username, timestamp });
 
     // Validate request data
     if (!username || typeof username !== 'string') {
@@ -79,7 +83,7 @@ export default async function handler(
       });
     }
 
-    // Less strict timestamp validation
+    // Validate timestamp
     if (!timestamp) {
       console.log('Missing timestamp');
       return res.status(400).json({ error: 'Timestamp is required' });
@@ -97,31 +101,33 @@ export default async function handler(
       });
     }
 
-    const users = await getUsers();
-    const existingUser = users.find(user => user.username.toLowerCase() === username.toLowerCase());
-
     try {
-      // Create or update user with timestamp
-      if (!existingUser) {
-        await addUser(username, timestamp);
+      // Find or create user
+      let user = await User.findOne({ username: username.toLowerCase() });
+      
+      if (!user) {
+        user = await User.create({
+          username: username.toLowerCase(),
+          registrationTime: new Date(timestamp),
+          lastActive: new Date()
+        });
       }
 
-      // Generate session token with error handling
-      let sessionToken;
-      try {
-        sessionToken = Buffer.from(`${username}-${Date.now()}`).toString('base64');
-      } catch (e) {
-        console.error('Session token generation error:', e);
-        return res.status(500).json({ error: 'Failed to generate session token' });
-      }
+      // Create a new session
+      const session = await SessionService.createSession(user._id.toString(), {
+        userAgent: req.headers['user-agent'],
+        ip: ip.toString()
+      });
 
       res.status(200).json({
         success: true,
-        sessionToken,
+        sessionToken: session.token,
+        userId: user._id,
+        username: user.username,
         loginTime: timestamp
       });
     } catch (e) {
-      console.error('User management error:', e);
+      console.error('User/Session management error:', e);
       return res.status(500).json({ error: 'Failed to manage user data' });
     }
   } catch (error) {
