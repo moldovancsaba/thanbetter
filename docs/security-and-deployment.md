@@ -35,10 +35,28 @@ Last Updated: 2025-06-04T19:57:56.789Z
 - Use parameterized queries for database operations
 
 ### Environment Security
+Last Updated: 2025-06-04T19:57:56.789Z
+
 - Use environment variables for sensitive data
 - Keep all dependencies up to date
 - Regular security updates and patches
-- Implement proper error handling
+- Implement proper error handling:
+  1. Structured Error Responses
+     - Include error codes
+     - Provide detailed messages
+     - Add ISO 8601 timestamps
+  2. Error Logging
+     - Log all errors with stack traces
+     - Include request context
+     - Maintain ISO 8601 timestamp format
+  3. Error Recovery
+     - Implement fallback mechanisms
+     - Add circuit breakers for external services
+     - Provide graceful degradation
+  4. Rate Limiting
+     - Add request rate monitoring
+     - Implement graduated response
+     - Log excessive attempts
 
 ## Common Vulnerabilities
 
@@ -60,6 +78,35 @@ Last Updated: 2025-06-04T19:57:56.789Z
    - Add password authentication
    - Implement proper session management
    - Add rate limiting
+
+## Known Issues and Solutions
+Last Updated: 2025-06-04T19:57:56.789Z
+
+### Authentication Endpoint Issues
+1. Internal Server Error
+   - Issue: 500 errors occurring on auth endpoint calls
+   - Root Cause: Missing CORS headers and strict timestamp validation
+   - Solution: Implemented proper CORS configuration and relaxed timestamp validation
+
+2. CORS Configuration
+   - Issue: Cross-Origin Resource Sharing blocking legitimate requests
+   - Solution: Added appropriate CORS headers in auth.ts:
+     ```typescript
+     res.setHeader('Access-Control-Allow-Origin', '*')
+     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+     ```
+
+3. Timestamp Validation
+   - Issue: Overly strict timestamp validation causing request rejections
+   - Solution: Implemented more flexible ISO 8601 validation with millisecond support
+   - Format: YYYY-MM-DDThh:mm:ss.sssZ (e.g., 2025-06-04T19:57:56.789Z)
+
+4. Error Handling
+   - Issue: Generic error responses without useful information
+   - Solution: Implemented structured error responses with:
+     - Error codes
+     - Detailed messages
+     - Timestamp of error occurrence
 
 ## Environment Configuration
 

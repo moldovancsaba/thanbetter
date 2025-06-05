@@ -1,6 +1,8 @@
 # Simple Login Module Documentation
 
-Last Updated: 2025-06-04T19:57:56.789Z
+Last Updated: 2025-06-05T12:04:01.000Z
+
+Refer to [Bugs and Fixes Documentation](./bugs-and-fixes.md) for details on resolved issues, especially about the auth endpoint internal server error.
 
 ## Overview
 A simple authentication system built with Next.js and TypeScript that allows users to log in with a username. The system stores user registration timestamps and maintains a list of all registered users.
