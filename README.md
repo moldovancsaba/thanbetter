@@ -2,6 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Project Updates
 
+- All project documentation is located in the `docs` folder
 - All timestamps in the UI and documentation follow ISO 8601 format with milliseconds (e.g., 2025-04-13T12:34:56.789Z)
 - Updated ESLint configuration used
 
