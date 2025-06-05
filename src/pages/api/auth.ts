@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import connectToDatabase from '../../lib/mongodb';
 import User from '../../models/User';
 import { SessionService } from '../../services/sessionService';
+import { validateUsername } from '../../utils/validation';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -12,6 +13,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { username } = req.body;
   const timestamp = new Date().toISOString();
+
+  const validation = validateUsername(username);
+  if (!validation.valid) {
+    return res.status(400).json({ error: validation.error });
+  }
 
   try {
     let user = await User.findOne({ username });

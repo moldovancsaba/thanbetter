@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { validateUsername } from '../utils/validation';
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
@@ -12,7 +13,11 @@ export default function LoginForm() {
     setError('');
     const trimmedUsername = username.trim();
     
-    if (!trimmedUsername) return;
+    const validation = validateUsername(trimmedUsername);
+    if (!validation.valid) {
+      setError(validation.error || 'Invalid username');
+      return;
+    }
     
     setLoading(true);
     try {

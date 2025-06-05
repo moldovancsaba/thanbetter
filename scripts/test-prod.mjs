@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
 async function testProduction() {
-  const BASE_URL = 'https://thanperfect-foqt16qgi-narimato.vercel.app';
+  const BASE_URL = 'https://thanperfect-3hz9q27ld-narimato.vercel.app';
   
   try {
     // 1. Test login

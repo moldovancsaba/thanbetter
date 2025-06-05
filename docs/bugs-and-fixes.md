@@ -1,6 +1,28 @@
 # Bugs and Fixes Documentation
 
-Last Updated: 2025-06-05T12:04:01.000Z
+Last Updated: 2025-06-05T17:49:12.000Z
+
+## MongoDB Atlas IP Access Restriction
+
+### Issue Description
+MongoDB Atlas connection was failing because the database was not configured to accept connections from all IP addresses. This caused connection timeouts and authentication failures.
+
+### Resolution
+Fixed by:
+1. Logging into MongoDB Atlas dashboard
+2. Navigating to Network Access section
+3. Adding a new IP address entry with 0.0.0.0/0 to allow connections from anywhere
+4. Alternatively, adding specific IP addresses for better security
+
+### Testing
+- Verified database connections work from development environment
+- Confirmed authentication flows are working
+- Tested user creation and login functionality
+
+### Notes
+- For production, consider restricting IP ranges to known addresses
+- Document all allowed IP addresses in deployment documentation
+- Regular audit of IP whitelist recommended
 
 ## Authentication Endpoint Internal Server Error
 

@@ -3,6 +3,7 @@ import connectToDatabase from '../../../lib/mongodb';
 import User from '../../../models/User';
 import { withAuth, AuthenticatedRequest } from '../../../middleware/authMiddleware';
 import { logger } from '../../../utils/logger';
+import { validateUsername } from '../../../utils/validation';
 
 async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   const { id } = req.query;
@@ -16,6 +17,11 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
 
         if (!username) {
           return res.status(400).json({ error: 'Username is required' });
+        }
+
+        const validation = validateUsername(username);
+        if (!validation.valid) {
+          return res.status(400).json({ error: validation.error });
         }
 
         // Check if username is already taken

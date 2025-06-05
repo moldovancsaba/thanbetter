@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { USERNAME_MIN_LENGTH } from '../utils/validation';
 
 export interface IUser extends mongoose.Document {
   username: string;
@@ -12,7 +13,8 @@ const userSchema = new mongoose.Schema({
   username: { 
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    minlength: [USERNAME_MIN_LENGTH, `Username must be at least ${USERNAME_MIN_LENGTH} characters long`]
   },
   email: {
     type: String,
