@@ -3,12 +3,14 @@ import mongoose from 'mongoose';
 export interface ISessionLog extends mongoose.Document {
   sessionId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  eventType: 'LOGIN' | 'LOGOUT' | 'EXPIRED';
+  eventType: 'LOGIN' | 'LOGOUT' | 'EXPIRED' | 'AUTHORIZE' | 'TOKEN_EXCHANGE' | 'USERINFO';
   timestamp: Date;
   metadata: {
     userAgent?: string;
     ip?: string;
     reason?: string;
+    clientId?: string;
+    ssoEvent?: 'AUTHORIZE' | 'TOKEN_EXCHANGE' | 'USERINFO';
   };
 }
 
@@ -25,7 +27,7 @@ const sessionLogSchema = new mongoose.Schema<ISessionLog>({
   },
   eventType: {
     type: String,
-    enum: ['LOGIN', 'LOGOUT', 'EXPIRED'],
+    enum: ['LOGIN', 'LOGOUT', 'EXPIRED', 'AUTHORIZE', 'TOKEN_EXCHANGE', 'USERINFO'],
     required: true
   },
   timestamp: {
@@ -36,7 +38,12 @@ const sessionLogSchema = new mongoose.Schema<ISessionLog>({
   metadata: {
     userAgent: String,
     ip: String,
-    reason: String
+    reason: String,
+    clientId: String,
+    ssoEvent: {
+      type: String,
+      enum: ['AUTHORIZE', 'TOKEN_EXCHANGE', 'USERINFO']
+    }
   }
 });
 

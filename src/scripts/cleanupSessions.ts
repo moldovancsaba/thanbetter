@@ -1,10 +1,10 @@
-import connectToDatabase from '../lib/mongodb';
+import clientPromise from '../lib/mongodb';
 import Session from '../models/Session';
 import { SessionService } from '../services/sessionService';
 
 async function cleanupExpiredSessions() {
   try {
-    await connectToDatabase();
+    await clientPromise;
 
     const now = new Date();
     const expiredSessions = await Session.find({

@@ -61,219 +61,150 @@ Last Updated: 2025-06-05T17:00:47.000Z
 
 Last Updated: 2025-06-05T12:14:49.000Z
 
-## Phase 1: Session Management Implementation
+# Project Roadmap
 
-### 1.1 Basic Session Infrastructure (Sprint 1)
-- [ ] Task 1.1.1: Create Session Model
-  - Define session schema (userId, token, createdAt, expiresAt)
-  - Implement session creation
-  - Implement session validation
-  - Add unit tests for session management
+Last Updated: 2025-06-06T10:52:40.000Z
 
-- [ ] Task 1.1.2: Session Storage Setup
-  - Implement session token generation
-  - Add session persistence logic
-  - Add session retrieval methods
-  - Add unit tests for storage operations
+## Phase 1: Core Authentication (Sprint 1: June 6-12)
 
-- [ ] Task 1.1.3: Session Authentication Middleware
-  - Create authentication middleware
-  - Implement token validation
-  - Add session expiration check
-  - Add unit tests for middleware
+### 1.1 Environment Setup
+- [ ] Task 1.1.1: NextAuth Configuration
+  - Configure NEXTAUTH_URL environment variable
+  - Set up NextAuth secret
+  - Fix npm audit vulnerabilities
+  - Add documentation for environment setup
 
-### 1.2 Session Logging (Sprint 1)
-- [ ] Task 1.2.1: Session Log Model
-  - Define session log schema
-  - Track login timestamps
-  - Track logout timestamps (manual and automatic)
-  - Add unit tests for logging model
-
-- [ ] Task 1.2.2: Session Log Integration
-  - Implement login event logging
-  - Implement logout event logging
-  - Add system-triggered logout logging
-  - Add unit tests for log integration
-
-### 1.3 Activity Logging (Sprint 2)
-- [ ] Task 1.3.1: Activity Log Model
-  - Define activity schema
-  - Design activity type enumeration
-  - Create activity tracking methods
-  - Add unit tests for activity model
-
-- [ ] Task 1.3.2: Activity Tracking Integration
-  - Implement activity logging middleware
-  - Add user action tracking
-  - Add API endpoint tracking
-  - Add unit tests for tracking integration
-
-## Phase 2: MongoDB Integration
-
-### 2.1 MongoDB Atlas Setup (Sprint 2)
-- [ ] Task 2.1.1: Infrastructure Setup
-  - Configure MongoDB Atlas cluster
-  - Set up separate databases for dev/prod
-  - Configure network access
-  - Document connection process
-
-- [ ] Task 2.1.2: Security Configuration
-  - Set up database users
-  - Configure authentication
-  - Implement secure credential storage
-  - Add security documentation
-
-### 2.2 Database Schema Implementation (Sprint 2)
-- [ ] Task 2.2.1: User Schema
+### 1.2 User Model Enhancement
+- [ ] Task 1.2.1: Update User Schema
   ```typescript
   interface User {
     _id: ObjectId;
     username: string;
-    registrationTime: Date;
-    lastActive: Date;
+    createdAt: string;    // ISO 8601 format
+    lastLoginAt: string;  // ISO 8601 format
   }
   ```
 
-- [ ] Task 2.2.2: Session Schema
+- [ ] Task 1.2.2: User Data Migration
+  - Create migration script for existing users
+  - Add timestamp fields
+  - Validate migrated data
+  - Add rollback functionality
+
+### 1.3 Core Authentication Implementation
+- [ ] Task 1.3.1: User Authentication
+  - Implement registration endpoint
+  - Add login/logout functionality
+  - Set up session management
+  - Configure JWT handling
+
+- [ ] Task 1.3.2: UI Components
+  - Update login form
+  - Add user profile component
+  - Create session info display
+  - Implement error handling
+
+## Phase 2: SSO Provider Setup (Sprint 2: June 13-19)
+
+### 2.1 Application Management
+- [ ] Task 2.1.1: Application Model
   ```typescript
-  interface Session {
+  interface ClientApplication {
     _id: ObjectId;
-    userId: ObjectId;
-    token: string;
-    createdAt: Date;
-    expiresAt: Date;
-    lastActive: Date;
+    name: string;
+    clientId: string;
+    clientSecret: string;
+    redirectUrls: string[];
+    createdAt: string;  // ISO 8601 format
+    updatedAt: string;  // ISO 8601 format
   }
   ```
 
-- [ ] Task 2.2.3: Session Log Schema
-  ```typescript
-  interface SessionLog {
-    _id: ObjectId;
-    sessionId: ObjectId;
-    userId: ObjectId;
-    eventType: 'LOGIN' | 'LOGOUT' | 'EXPIRED';
-    timestamp: Date;
-    metadata: {
-      userAgent?: string;
-      ip?: string;
-      reason?: string;
-    };
-  }
-  ```
+- [ ] Task 2.1.2: Application CRUD
+  - Create management UI
+  - Implement CRUD operations
+  - Add validation
+  - Set up error handling
 
-- [ ] Task 2.2.4: Activity Log Schema
-  ```typescript
-  interface ActivityLog {
-    _id: ObjectId;
-    sessionId: ObjectId;
-    userId: ObjectId;
-    activityType: string;
-    timestamp: Date;
-    details: {
-      endpoint?: string;
-      method?: string;
-      params?: Record<string, unknown>;
-      response?: {
-        status: number;
-        timestamp: Date;
-      };
-    };
-  }
-  ```
+### 2.2 OAuth2 Implementation
+- [ ] Task 2.2.1: OAuth Endpoints
+  - Authorization endpoint
+  - Token endpoint
+  - User info endpoint
+  - Add documentation
 
-### 2.3 Data Migration (Sprint 3)
-- [ ] Task 2.3.1: Migration Scripts
-  - Create user data migration script
-  - Add data validation
-  - Implement rollback functionality
-  - Add migration documentation
+- [ ] Task 2.2.2: OAuth Flow
+  - Implement authorization flow
+  - Add token exchange
+  - Set up user info retrieval
+  - Add error handling
 
-- [ ] Task 2.3.2: Database Integration
-  - Update user service
-  - Update session service
-  - Update logging service
-  - Add integration tests
+## Phase 3: Security and Integration (Sprint 3: June 20-26)
+
+### 3.1 Security Implementation
+- [ ] Task 3.1.1: Core Security
+  - Set up CORS
+  - Implement rate limiting
+  - Configure token security
+  - Add attack prevention
+
+### 3.2 Integration Resources
+- [ ] Task 3.2.1: Client SDK
+  - Create TypeScript SDK
+  - Add documentation
+  - Implement example usage
+  - Add tests
+
+- [ ] Task 3.2.2: Example Integration
+  - Create example application
+  - Implement SSO flow
+  - Add error handling
+  - Create tests
 
 ## Testing Strategy
 
 ### Unit Tests
-- Models and schemas
-- Service layer functions
-- Middleware components
-- Utility functions
+- Authentication functions
+- OAuth2 endpoints
+- Token handling
+- Data models
 
 ### Integration Tests
-- API endpoints
-- Database operations
-- Authentication flow
-- Logging system
+- SSO flow
+- Client application management
+- User authentication
+- Security measures
 
 ### E2E Tests
-- User session flow
-- Activity tracking
-- Login/logout scenarios
-- Error handling
+- Complete SSO flow
+- Application management
+- Error scenarios
+- Performance testing
 
-## Implementation Details
-
-### MongoDB Connection
-```typescript
-// src/lib/mongodb.ts
-import { MongoClient } from 'mongodb';
-
-if (!process.env.MONGODB_URI) {
-  throw new Error('MONGODB_URI environment variable is not set');
-}
-
-const uri = process.env.MONGODB_URI;
-const options = {
-  retryWrites: true,
-  w: 'majority',
-};
-
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
-
-if (process.env.NODE_ENV === 'development') {
-  // In development, use a global variable to preserve connection across HMR
-  if (!(global as any)._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    (global as any)._mongoClientPromise = client.connect();
-  }
-  clientPromise = (global as any)._mongoClientPromise;
-} else {
-  // In production, create a new connection
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
-}
-
-export default clientPromise;
-```
-
-### Environment Variables
+## Required Environment Variables
 ```env
 MONGODB_URI=mongodb+srv://moldovancsaba:{{db_password}}@mongodb-thanperfect.zf2o0ix.mongodb.net/?retryWrites=true&w=majority&appName=mongodb-thanperfect
-SESSION_SECRET=your-session-secret
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-nextauth-secret
 NODE_ENV=development
 ```
 
 ## Timeline
 
-### Sprint 1 (2 weeks)
-- Session Management Infrastructure
-- Session Logging
-- Basic Tests
+### Sprint 1 (June 6-12)
+- Core Authentication
+- User Management
+- Basic UI
 
-### Sprint 2 (2 weeks)
-- Activity Logging
-- MongoDB Atlas Setup
-- Schema Implementation
+### Sprint 2 (June 13-19)
+- SSO Provider
+- OAuth2 Implementation
+- Application Management
 
-### Sprint 3 (1 week)
-- Data Migration
-- Integration Testing
+### Sprint 3 (June 20-26)
+- Security Features
+- SDK Development
 - Documentation
 
-Target Completion: 2025-07-04T00:00:00.000Z
+Target Completion: 2025-06-26T23:59:59.999Z
 

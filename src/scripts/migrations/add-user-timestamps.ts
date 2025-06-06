@@ -1,10 +1,10 @@
 import { logger } from '../../utils/logger';
-import connectToDatabase from '../../lib/mongodb';
+import clientPromise from '../../lib/mongodb';
 import User from '../../models/User';
 
 async function migrateUserTimestamps() {
   try {
-    await connectToDatabase();
+    await clientPromise;
     logger.info('Connected to database');
 
     // Find all users without timestamps

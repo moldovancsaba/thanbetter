@@ -1,12 +1,10 @@
 import mongoose from 'mongoose';
-import { USERNAME_MIN_LENGTH } from '../utils/validation';
 
 export interface IUser extends mongoose.Document {
   username: string;
-  email?: string;
   createdAt: string;  // ISO 8601 string
-  updatedAt: string;  // ISO 8601 string
-  lastLoginAt?: string;  // ISO 8601 string
+  lastLogin: string;  // ISO 8601 string
+  updatedAt?: string;  // ISO 8601 string
 }
 
 const userSchema = new mongoose.Schema({
@@ -14,32 +12,25 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    minlength: [USERNAME_MIN_LENGTH, `Username must be at least ${USERNAME_MIN_LENGTH} characters long`]
-  },
-  email: {
-    type: String,
-    sparse: true,
-    index: true
+    minlength: [2, 'Username must be at least 2 characters long']
   },
   createdAt: {
-    type: Date,
-    default: () => new Date(),
-    get: (v: Date) => v.toISOString()
+    type: String,
+    required: true
   },
-  lastLoginAt: {
-    type: Date,
-    default: null,
-    get: (v: Date | null) => v ? v.toISOString() : null
+  lastLogin: {
+    type: String,
+    required: true
+  },
+  updatedAt: {
+    type: String
   }
 }, {
-  timestamps: true,
   toJSON: { 
-    getters: true,
-    transform: (doc, ret) => {
-      // Ensure timestamps are in ISO 8601 format
-      if (ret.createdAt) ret.createdAt = new Date(ret.createdAt).toISOString();
-      if (ret.updatedAt) ret.updatedAt = new Date(ret.updatedAt).toISOString();
-      if (ret.lastLoginAt) ret.lastLoginAt = new Date(ret.lastLoginAt).toISOString();
+    transform: (_, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
       return ret;
     }
   }
